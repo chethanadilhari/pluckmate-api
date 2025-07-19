@@ -20,6 +20,12 @@ enum EmployeeRole {
   WORKER
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -34,7 +40,7 @@ model User {
 }
 
 model Employee {
-  id        String       @id @default(uuid())
+  id        Int       @id @default(autoincrement())
   firstName      String
   lastName   String
   nic   String @unique
@@ -45,6 +51,8 @@ model Employee {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
+  attendances Attendance[]
+  
     @@map("employees")
 }
 
@@ -59,4 +67,19 @@ model Profile {
   userId    String   @unique
 
     @@map("profiles")
+}
+
+model Attendance {
+  id         Int       @id @default(autoincrement())
+  date       DateTime
+  status     AttendanceStatus
+
+  employee   Employee  @relation(fields: [employeeId], references: [id])
+  employeeId Int
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([employeeId, date]) // to prevent multiple attendance for same day
+  @@map("attendances")
 }

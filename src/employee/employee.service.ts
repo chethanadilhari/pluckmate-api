@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../core/services/prisma.service';
 import { EmployeeRole } from '@prisma/client';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -34,36 +34,33 @@ export class EmployeeService {
     return this.prisma.employee.findMany({ where });
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     return this.prisma.employee.findUnique({ where: { id } });
   }
 
-  async update(id: string, dto: UpdateEmployeeDto) {
-  const existing = await this.prisma.employee.findUnique({ where: { id } });
-  if (!existing) throw new Error('Employee not found');
+  async update(id: number, dto: UpdateEmployeeDto) {
+    const existing = await this.prisma.employee.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Employee not found');
 
-  // Check NIC uniqueness (only if nic is being updated)
-  if (dto.nic && dto.nic !== existing.nic) {
-    const nicExists = await this.prisma.employee.findUnique({
-      where: { nic: dto.nic },
-    });
-    if (nicExists) {
-      throw new Error('NIC already exists for another employee');
+    if (dto.nic && dto.nic !== existing.nic) {
+      const nicExists = await this.prisma.employee.findUnique({ where: { nic: dto.nic } });
+      if (nicExists) {
+        throw new BadRequestException('NIC already exists for another employee');
+      }
     }
+
+    const data: any = { ...dto };
+    if (data.joinedDate) {
+      data.joinedDate = new Date(data.joinedDate);
+    }
+
+    return this.prisma.employee.update({
+      where: { id },
+      data,
+    });
   }
 
-  const data: any = { ...dto };
-  if (data.joinedDate) {
-    data.joinedDate = new Date(data.joinedDate);
-  }
-
-  return this.prisma.employee.update({
-    where: { id },
-    data,
-  });
-}
-
-  async remove(id: string) {
+  async remove(id: number) {
     return this.prisma.employee.delete({ where: { id } });
   }
 }
