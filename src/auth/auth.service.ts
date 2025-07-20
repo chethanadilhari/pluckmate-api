@@ -34,7 +34,7 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, role: user.role };
 
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
       user,
     };
   }
@@ -65,7 +65,7 @@ export class AuthService {
     { sub: user.id },
     {
       secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
-      expiresIn: '15m',
+      expiresIn: '1h',
     }
   );
 

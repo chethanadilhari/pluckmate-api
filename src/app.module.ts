@@ -8,11 +8,12 @@ import { AuthModule } from './auth/auth.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { HarvestModule } from './harvest/harvest.module';
 import { TaskTemplateModule } from './task-template/task-template.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), 
-    EmployeeModule, AuthModule, AttendanceModule, HarvestModule, TaskTemplateModule
+    EmployeeModule, AuthModule, AttendanceModule, HarvestModule, TaskTemplateModule, TaskModule
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService], 

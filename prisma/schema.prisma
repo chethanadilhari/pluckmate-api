@@ -32,7 +32,11 @@ enum TaskCategory {
 FERTILIZING
 }
 
-
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
 
 model User {
   id        String   @id @default(uuid())
@@ -61,7 +65,8 @@ model Employee {
 
   attendances Attendance[]
   harvests Harvest[]
-  
+  tasks  Task[]
+
     @@map("employees")
 }
 
@@ -116,8 +121,31 @@ model TaskTemplate {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  tasks Task[]
+
   @@map("task_templates")
   @@index([name])
   @@index([category])
 }
+
+
+model Task {
+  id            Int           @id @default(autoincrement())
+  employee      Employee      @relation(fields: [employeeId], references: [id])
+  employeeId    Int
+  taskTemplate  TaskTemplate  @relation(fields: [taskTemplateId], references: [id])
+  taskTemplateId Int
+  block         String
+  field         String
+  note          String?
+  status        TaskStatus    @default(PENDING)
+  date          DateTime
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([employeeId, date, taskTemplateId])
+  @@map("tasks")
+}
+
+
 
