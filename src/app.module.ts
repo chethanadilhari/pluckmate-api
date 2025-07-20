@@ -6,11 +6,12 @@ import { PrismaService } from './core/services/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { HarvestModule } from './harvest/harvest.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), 
-    EmployeeModule, AuthModule, AttendanceModule],
+    EmployeeModule, AuthModule, AttendanceModule, HarvestModule],
   controllers: [AppController],
   providers: [AppService, PrismaService], 
 })
