@@ -25,6 +25,14 @@ enum AttendanceStatus {
   ABSENT
 }
 
+enum TaskCategory {
+  MAINTENANCE
+  CLEANING
+  PLUCKING
+FERTILIZING
+}
+
+
 
 model User {
   id        String   @id @default(uuid())
@@ -97,3 +105,19 @@ model Harvest {
   @@unique([employeeId, date]) // Prevent duplicate entries per day
   @@map("harvests")
 }
+
+model TaskTemplate {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  duration     Int       // duration in minutes
+  fixedPayment Float
+  category     TaskCategory
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("task_templates")
+  @@index([name])
+  @@index([category])
+}
+

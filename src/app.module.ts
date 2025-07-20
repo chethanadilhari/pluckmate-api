@@ -7,11 +7,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { HarvestModule } from './harvest/harvest.module';
+import { TaskTemplateModule } from './task-template/task-template.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), 
-    EmployeeModule, AuthModule, AttendanceModule, HarvestModule],
+    EmployeeModule, AuthModule, AttendanceModule, HarvestModule, TaskTemplateModule
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService], 
 })
