@@ -2,7 +2,6 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/core/services/prisma.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { FilterAttendanceDto } from './dto/filter-attendance.dto';
 import dayjs from 'dayjs'
 import { AttendanceStatus } from '@prisma/client';
 
@@ -61,27 +60,45 @@ export class AttendanceService {
     });
   }
 
-  // Get all attendance for today
-  async getTodayAttendance() {
-    const today = dayjs().startOf('day').toDate();
+  async getAttendanceByDate(date: string, name?: string) {
+    // const targetDate = new Date(date);
+    const parsedDate = new Date(date);
 
-    return this.prisma.attendance.findMany({
-      where: { date: today },
-      include: { employee: true },
-    });
+  if (isNaN(parsedDate.getTime())) {
+    throw new Error('Invalid date format. Expected format: YYYY-MM-DD');
   }
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  // Filter attendance by date range
-  async getAttendanceByRange(dto: FilterAttendanceDto) {
-    return this.prisma.attendance.findMany({
-      where: {
-        date: {
-          gte: dto.from ? new Date(dto.from) : undefined,
-          lte: dto.to ? new Date(dto.to) : undefined,
-        },
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    console.log('Fetching attendance for date:', startOfDay, 'to', endOfDay);
+
+    const where: any = {
+      date: {
+        gte: startOfDay,
+        lte: endOfDay,
       },
-      include: { employee: true },
-      orderBy: { date: 'desc' },
-    });
+    };
+
+  if (name) {
+    where.employee = {
+      OR: [
+        { firstName: { contains: name } },
+        { lastName: { contains: name } },
+      ],
+    };
   }
+
+  return this.prisma.attendance.findMany({
+    where,
+    include: { employee: true },
+    orderBy: { employeeId: 'asc' },
+  });
 }
+
+
+
+}
+ 

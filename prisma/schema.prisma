@@ -52,6 +52,7 @@ model Employee {
   updatedAt DateTime     @updatedAt
 
   attendances Attendance[]
+  harvests Harvest[]
   
     @@map("employees")
 }
@@ -82,4 +83,17 @@ model Attendance {
 
   @@unique([employeeId, date]) // to prevent multiple attendance for same day
   @@map("attendances")
+}
+
+model Harvest {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  amountKg    Float
+  date        DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([employeeId, date]) // Prevent duplicate entries per day
+  @@map("harvests")
 }

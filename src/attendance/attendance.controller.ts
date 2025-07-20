@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { FilterAttendanceDto } from './dto/filter-attendance.dto';
 import { AttendanceStatus } from '@prisma/client';
 
 @Controller('attendance')
@@ -30,15 +29,11 @@ export class AttendanceController {
     return this.attendanceService.updateAttendance(employeeId, status);
   }
 
-  
-
-  @Get('today')
-  getToday() {
-    return this.attendanceService.getTodayAttendance();
-  }
-
-  @Get('range')
-  getByRange(@Query() dto: FilterAttendanceDto) {
-    return this.attendanceService.getAttendanceByRange(dto);
+  @Get()
+  getAttendanceForDate(
+    @Query('date') date: string,
+    @Query('name') name?: string
+  ) {
+    return this.attendanceService.getAttendanceByDate(date, name);
   }
 }
