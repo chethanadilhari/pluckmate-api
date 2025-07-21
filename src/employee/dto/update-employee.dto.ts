@@ -23,6 +23,10 @@ export class UpdateEmployeeDto {
   phoneNo?: string;
 
   @IsOptional()
+  @IsDateString()
+  joinedDate?: string; // or Date
+
+  @IsOptional()
   @IsEnum(EmployeeRole)
   role?: EmployeeRole;
 }
