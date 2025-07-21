@@ -17,26 +17,32 @@ export class EmployeeService {
     });
   }
 
-  async findAll(filter?: { name?: string; role?: EmployeeRole }) {
-    const where: any = {};
+async findAll(filter?: { name?: string; role?: EmployeeRole }) {
+  const where: any = {
+    isActive: true, // Only return non-deleted (active) employees
+  };
 
     if (filter?.name) {
-      where.OR = [
+    where.OR = [
         { firstName: { contains: filter.name } },
         { lastName: { contains: filter.name } },
-      ];
-    }
+    ];
+  }
 
-    if (filter?.role) {
-      where.role = filter.role;
-    }
+  if (filter?.role) {
+    where.role = filter.role;
+  }
 
     return this.prisma.employee.findMany({ where });
-  }
+}
 
-  async findOne(id: number) {
-    return this.prisma.employee.findUnique({ where: { id } });
-  }
+
+ async findOne(id: number) {
+  const employee = await this.prisma.employee.findUnique({ where: { id } });
+  if (!employee) throw new NotFoundException('Employee not found');
+  return employee;
+}
+
 
   async update(id: number, dto: UpdateEmployeeDto) {
     const existing = await this.prisma.employee.findUnique({ where: { id } });
@@ -60,7 +66,17 @@ export class EmployeeService {
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.employee.delete({ where: { id } });
+async remove(id: number) {
+  const existing = await this.prisma.employee.findUnique({ where: { id } });
+
+  if (!existing) {
+    throw new NotFoundException('Employee not found');
   }
+
+  // Soft delete by marking employee as inactive
+  return this.prisma.employee.update({
+    where: { id },
+    data: { isActive: false },
+  });
+}
 }
